@@ -1,0 +1,31 @@
+name: Test merch store functionality
+on:
+  push:
+    branches:
+      - '*'
+    paths:
+      - 'internal/**.go'
+  pull_request:
+    branches:
+      - '*'
+    paths:
+      - 'internal/**.go'
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
+      - name: Install dependencies
+        run: go mod tidy
+
+      - name: Run tests
+        run: go test ./internal/api/... -v --cover
