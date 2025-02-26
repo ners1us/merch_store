@@ -34,8 +34,7 @@ func HandleBuy(ctx *gin.Context) {
 		}
 
 		var currentUser models.User
-		if err := tx.Table("users").
-			Where("id = ?", user.ID).
+		if err := tx.Where("id = ?", user.ID).
 			First(&currentUser).Error; err != nil {
 			return err
 		}

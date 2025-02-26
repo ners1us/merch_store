@@ -30,8 +30,7 @@ func HandleSendCoin(ctx *gin.Context) {
 
 	err := db.Transaction(func(tx *gorm.DB) error {
 		var sender models.User
-		if err := tx.Table("users").
-			Where("id = ?", user.ID).
+		if err := tx.Where("id = ?", user.ID).
 			First(&sender).Error; err != nil {
 			return err
 		}
@@ -40,8 +39,7 @@ func HandleSendCoin(ctx *gin.Context) {
 		}
 
 		var receiver models.User
-		if err := tx.Table("users").
-			Where("username = ?", request.ToUser).
+		if err := tx.Where("username = ?", request.ToUser).
 			First(&receiver).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				return enums.ErrReceiverNotFound
