@@ -3,6 +3,7 @@
 
 ## Инструменты
 - Go
+- Gin
 - SQL
 - Docker
 - PostgreSQL
