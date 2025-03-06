@@ -24,7 +24,7 @@ func HandleSendCoin(ctx *gin.Context) {
 		return
 	}
 	if request.Amount <= 0 {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": enums.ErrCoinsAppropriateAmount.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": enums.ErrCoinsInappropriateAmount.Error()})
 		return
 	}
 

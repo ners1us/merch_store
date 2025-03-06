@@ -89,7 +89,7 @@ func TestHandleSendCoinInvalidAmount(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 	var request map[string]string
 	require.NoError(t, json.Unmarshal(w.Body.Bytes(), &request))
-	assert.Equal(t, enums.ErrCoinsAppropriateAmount.Error(), request["error"])
+	assert.Equal(t, enums.ErrCoinsInappropriateAmount.Error(), request["error"])
 }
 
 func TestHandleSendCoinInsufficientFunds(t *testing.T) {

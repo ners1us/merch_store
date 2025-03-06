@@ -7,7 +7,7 @@ const (
 	ErrReceiverNotFound
 	ErrUserNotAuthorized
 	ErrWrongReqFormat
-	ErrCoinsAppropriateAmount
+	ErrCoinsInappropriateAmount
 	ErrReceivingCoinsInfo
 	ErrInvalidToken
 	ErrNoUsernameAndPassword
@@ -29,7 +29,7 @@ var errorMessages = map[ErrorType]string{
 	ErrReceiverNotFound:         "пользователь к переводу не нашелся",
 	ErrUserNotAuthorized:        "пользователь не авторизован",
 	ErrWrongReqFormat:           "неверный формат запроса",
-	ErrCoinsAppropriateAmount:   "количество монет должно быть больше нуля",
+	ErrCoinsInappropriateAmount: "количество монет должно быть больше нуля",
 	ErrReceivingCoinsInfo:       "ошибка получения информации о монетах",
 	ErrInvalidToken:             "неверный или просроченный токен",
 	ErrNoUsernameAndPassword:    "имя пользователя и пароль обязательны",
