@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    restart: unless-stopped
     depends_on:
       postgres-db:
         condition: service_healthy
@@ -16,6 +17,7 @@ services:
 
   postgres-db:
     image: postgres:latest
+    restart: unless-stopped
     ports:
       - "5432:5432"
     environment:
