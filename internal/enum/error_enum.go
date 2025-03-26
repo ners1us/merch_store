@@ -22,6 +22,7 @@ const (
 	ErrCreatingUser
 	ErrNoAuthToken
 	ErrWrongTokenFormat
+	ErrEqualReceivers
 )
 
 var errorMessages = map[ErrorType]string{
@@ -44,6 +45,7 @@ var errorMessages = map[ErrorType]string{
 	ErrCreatingUser:             "ошибка создания пользователя",
 	ErrNoAuthToken:              "нет токена авторизации",
 	ErrWrongTokenFormat:         "неверный формат токена",
+	ErrEqualReceivers:           "получатели должны отличаться друг от друга",
 }
 
 func (et ErrorType) Error() string {
