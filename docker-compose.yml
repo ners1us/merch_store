@@ -10,6 +10,7 @@ services:
     environment:
       - DB_URL=postgres://admin:password@postgres-db:5432/merch_store_db
       - JWT_SECRET=too_elaborate_jwt_secret
+      - PORT=8080
     ports:
       - "8080:8080"
     networks:
