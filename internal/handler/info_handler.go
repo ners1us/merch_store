@@ -2,7 +2,7 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/ners1us/merch_store/internal/enums"
+	"github.com/ners1us/merch_store/internal/enum"
 	"github.com/ners1us/merch_store/internal/model"
 	"net/http"
 )
@@ -10,14 +10,14 @@ import (
 func HandleInfo(ctx *gin.Context) {
 	userInterface, exists := ctx.Get("user")
 	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": enums.ErrUserNotAuthorized.Error()})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": enum.ErrUserNotAuthorized.Error()})
 		return
 	}
 	user := userInterface.(model.User)
 
 	var dbUser model.User
 	if err := db.First(&dbUser, user.ID).Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": enums.ErrReceivingCoinsInfo.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": enum.ErrReceivingCoinsInfo.Error()})
 		return
 	}
 	coins := dbUser.Coins
@@ -28,7 +28,7 @@ func HandleInfo(ctx *gin.Context) {
 		Where("user_id = ?", user.ID).
 		Group("merch_item").
 		Scan(&inventory).Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": enums.ErrReceivingPurchaseHistory.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": enum.ErrReceivingPurchaseHistory.Error()})
 		return
 	}
 
@@ -38,7 +38,7 @@ func HandleInfo(ctx *gin.Context) {
 		Joins("join users on coin_transfers.from_user_id = users.id").
 		Where("coin_transfers.to_user_id = ?", user.ID).
 		Scan(&received).Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": enums.ErrReceivingTransferHistory.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": enum.ErrReceivingTransferHistory.Error()})
 		return
 	}
 
@@ -48,7 +48,7 @@ func HandleInfo(ctx *gin.Context) {
 		Joins("join users on coin_transfers.to_user_id = users.id").
 		Where("coin_transfers.from_user_id = ?", user.ID).
 		Scan(&sent).Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": enums.ErrReceivingTransferHistory.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": enum.ErrReceivingTransferHistory.Error()})
 		return
 	}
 

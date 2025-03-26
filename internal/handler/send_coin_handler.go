@@ -3,7 +3,7 @@ package handler
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/ners1us/merch_store/internal/enums"
+	"github.com/ners1us/merch_store/internal/enum"
 	"github.com/ners1us/merch_store/internal/model"
 	"gorm.io/gorm"
 	"net/http"
@@ -13,18 +13,18 @@ import (
 func HandleSendCoin(ctx *gin.Context) {
 	userInterface, exists := ctx.Get("user")
 	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": enums.ErrUserNotAuthorized.Error()})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": enum.ErrUserNotAuthorized.Error()})
 		return
 	}
 	user := userInterface.(model.User)
 
 	var request model.SendCoinRequest
 	if err := ctx.ShouldBindJSON(&request); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": enums.ErrWrongReqFormat.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": enum.ErrWrongReqFormat.Error()})
 		return
 	}
 	if request.Amount <= 0 {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": enums.ErrCoinsInappropriateAmount.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": enum.ErrCoinsInappropriateAmount.Error()})
 		return
 	}
 
@@ -35,14 +35,14 @@ func HandleSendCoin(ctx *gin.Context) {
 			return err
 		}
 		if sender.Coins < request.Amount {
-			return enums.ErrInsufficientMoney
+			return enum.ErrInsufficientMoney
 		}
 
 		var receiver model.User
 		if err := tx.Where("username = ?", request.ToUser).
 			First(&receiver).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
-				return enums.ErrReceiverNotFound
+				return enum.ErrReceiverNotFound
 			}
 			return err
 		}
@@ -74,5 +74,5 @@ func HandleSendCoin(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": enums.SuccessfulTransfer.String()})
+	ctx.JSON(http.StatusOK, gin.H{"message": enum.SuccessfulTransfer.String()})
 }

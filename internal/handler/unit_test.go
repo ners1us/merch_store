@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/ners1us/merch_store/internal/enums"
+	"github.com/ners1us/merch_store/internal/enum"
 	"github.com/ners1us/merch_store/internal/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -42,7 +42,7 @@ func TestHandleSendCoinUnauthorized(t *testing.T) {
 	var response map[string]string
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	require.NoError(t, err)
-	assert.Equal(t, enums.ErrUserNotAuthorized.Error(), response["error"])
+	assert.Equal(t, enum.ErrUserNotAuthorized.Error(), response["error"])
 }
 
 func TestHandleSendCoinInvalidJSON(t *testing.T) {
@@ -62,7 +62,7 @@ func TestHandleSendCoinInvalidJSON(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 	var response map[string]string
 	require.NoError(t, json.Unmarshal(w.Body.Bytes(), &response))
-	assert.Equal(t, enums.ErrWrongReqFormat.Error(), response["error"])
+	assert.Equal(t, enum.ErrWrongReqFormat.Error(), response["error"])
 }
 
 func TestHandleSendCoinInvalidAmount(t *testing.T) {
@@ -89,7 +89,7 @@ func TestHandleSendCoinInvalidAmount(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 	var request map[string]string
 	require.NoError(t, json.Unmarshal(w.Body.Bytes(), &request))
-	assert.Equal(t, enums.ErrCoinsInappropriateAmount.Error(), request["error"])
+	assert.Equal(t, enum.ErrCoinsInappropriateAmount.Error(), request["error"])
 }
 
 func TestHandleSendCoinInsufficientFunds(t *testing.T) {
@@ -118,7 +118,7 @@ func TestHandleSendCoinInsufficientFunds(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 	var response map[string]string
 	require.NoError(t, json.Unmarshal(w.Body.Bytes(), &response))
-	assert.Equal(t, enums.ErrInsufficientMoney.Error(), response["error"])
+	assert.Equal(t, enum.ErrInsufficientMoney.Error(), response["error"])
 }
 
 func TestHandleInfoUnauthorized(t *testing.T) {
@@ -134,7 +134,7 @@ func TestHandleInfoUnauthorized(t *testing.T) {
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
 	var response map[string]string
 	require.NoError(t, json.Unmarshal(w.Body.Bytes(), &response))
-	assert.Equal(t, enums.ErrUserNotAuthorized.Error(), response["error"])
+	assert.Equal(t, enum.ErrUserNotAuthorized.Error(), response["error"])
 }
 
 func TestHandleInfoDBUserNotFound(t *testing.T) {
@@ -152,7 +152,7 @@ func TestHandleInfoDBUserNotFound(t *testing.T) {
 	assert.Equal(t, http.StatusInternalServerError, w.Code)
 	var response map[string]string
 	require.NoError(t, json.Unmarshal(w.Body.Bytes(), &response))
-	assert.Equal(t, enums.ErrReceivingCoinsInfo.Error(), response["error"])
+	assert.Equal(t, enum.ErrReceivingCoinsInfo.Error(), response["error"])
 }
 
 func TestHandleInfoSuccess(t *testing.T) {
@@ -242,7 +242,7 @@ func TestHandleBuyNoItemProvided(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 	var response map[string]string
 	require.NoError(t, json.Unmarshal(w.Body.Bytes(), &response))
-	assert.Equal(t, enums.ErrNotProvidedItem.Error(), response["error"])
+	assert.Equal(t, enum.ErrNotProvidedItem.Error(), response["error"])
 }
 
 func TestHandleBuyItemNotFound(t *testing.T) {
@@ -263,7 +263,7 @@ func TestHandleBuyItemNotFound(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 	var response map[string]string
 	require.NoError(t, json.Unmarshal(w.Body.Bytes(), &response))
-	assert.Equal(t, enums.ErrItemNotFound.Error(), response["error"])
+	assert.Equal(t, enum.ErrItemNotFound.Error(), response["error"])
 }
 
 func TestHandleBuyInsufficientFunds(t *testing.T) {
@@ -286,7 +286,7 @@ func TestHandleBuyInsufficientFunds(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 	var response map[string]string
 	require.NoError(t, json.Unmarshal(w.Body.Bytes(), &response))
-	assert.Equal(t, enums.ErrBuyWithInsufficientMoney.Error(), response["error"])
+	assert.Equal(t, enum.ErrBuyWithInsufficientMoney.Error(), response["error"])
 }
 
 func TestHandleBuySuccess(t *testing.T) {
@@ -309,7 +309,7 @@ func TestHandleBuySuccess(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 	var response map[string]string
 	require.NoError(t, json.Unmarshal(w.Body.Bytes(), &response))
-	assert.Equal(t, enums.SuccessfulPurchase.String(), response["message"])
+	assert.Equal(t, enum.SuccessfulPurchase.String(), response["message"])
 
 	var updatedUser model.User
 	require.NoError(t, db.First(&updatedUser, user.ID).Error)

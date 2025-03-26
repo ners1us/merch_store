@@ -3,7 +3,7 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
-	"github.com/ners1us/merch_store/internal/enums"
+	"github.com/ners1us/merch_store/internal/enum"
 	"github.com/ners1us/merch_store/internal/model"
 	"net/http"
 	"strings"
@@ -13,13 +13,13 @@ func AuthMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		authHeader := ctx.GetHeader("Authorization")
 		if authHeader == "" {
-			ctx.JSON(http.StatusUnauthorized, gin.H{"error": enums.ErrNoAuthToken.Error()})
+			ctx.JSON(http.StatusUnauthorized, gin.H{"error": enum.ErrNoAuthToken.Error()})
 			ctx.Abort()
 			return
 		}
 		parts := strings.Split(authHeader, " ")
 		if parts[0] != "Bearer" || len(parts) != 2 {
-			ctx.JSON(http.StatusUnauthorized, gin.H{"error": enums.ErrWrongTokenFormat.Error()})
+			ctx.JSON(http.StatusUnauthorized, gin.H{"error": enum.ErrWrongTokenFormat.Error()})
 			ctx.Abort()
 			return
 		}
@@ -30,7 +30,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			return jwtSecret, nil
 		})
 		if err != nil || !token.Valid {
-			ctx.JSON(http.StatusUnauthorized, gin.H{"error": enums.ErrInvalidToken.Error()})
+			ctx.JSON(http.StatusUnauthorized, gin.H{"error": enum.ErrInvalidToken.Error()})
 			ctx.Abort()
 			return
 		}

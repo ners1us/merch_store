@@ -14,7 +14,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/ners1us/merch_store/internal/enums"
+	"github.com/ners1us/merch_store/internal/enum"
 	"github.com/ners1us/merch_store/internal/model"
 	"github.com/testcontainers/testcontainers-go/wait"
 	"gorm.io/driver/postgres"
@@ -152,8 +152,8 @@ func TestBuyMerch(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Ошибка декодирования ответа покупки: %v", err)
 	}
-	if buyResponse["message"] != enums.SuccessfulPurchase.String() {
-		t.Errorf("Ожидалось сообщение %q, но получено %q", enums.SuccessfulPurchase.String(), buyResponse["message"])
+	if buyResponse["message"] != enum.SuccessfulPurchase.String() {
+		t.Errorf("Ожидалось сообщение %q, но получено %q", enum.SuccessfulPurchase.String(), buyResponse["message"])
 	}
 
 	request, err = http.NewRequest("GET", ts.URL+"/api/info", nil)
@@ -220,8 +220,8 @@ func TestSendCoin(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Ошибка декодирования ответа отправки монет: %v", err)
 	}
-	if transferResponse["message"] != enums.SuccessfulTransfer.String() {
-		t.Errorf("Ожидалось сообщение %q, но получено %q", enums.SuccessfulTransfer.String(), transferResponse["message"])
+	if transferResponse["message"] != enum.SuccessfulTransfer.String() {
+		t.Errorf("Ожидалось сообщение %q, но получено %q", enum.SuccessfulTransfer.String(), transferResponse["message"])
 	}
 
 	request, err = http.NewRequest("GET", ts.URL+"/api/info", nil)

@@ -3,7 +3,7 @@ package handler
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/ners1us/merch_store/internal/enums"
+	"github.com/ners1us/merch_store/internal/enum"
 	"github.com/ners1us/merch_store/internal/model"
 	"gorm.io/gorm"
 	"net/http"
@@ -13,14 +13,14 @@ import (
 func HandleBuy(ctx *gin.Context) {
 	userInterface, exists := ctx.Get("user")
 	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": enums.ErrUserNotAuthorized.Error()})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": enum.ErrUserNotAuthorized.Error()})
 		return
 	}
 	user := userInterface.(model.User)
 
 	item := ctx.Param("item")
 	if item == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": enums.ErrNotProvidedItem.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": enum.ErrNotProvidedItem.Error()})
 		return
 	}
 
@@ -28,7 +28,7 @@ func HandleBuy(ctx *gin.Context) {
 		var merch model.Merch
 		if err := tx.Where("name = ?", item).First(&merch).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
-				return enums.ErrItemNotFound
+				return enum.ErrItemNotFound
 			}
 			return err
 		}
@@ -39,7 +39,7 @@ func HandleBuy(ctx *gin.Context) {
 			return err
 		}
 		if currentUser.Coins < merch.Price {
-			return enums.ErrBuyWithInsufficientMoney
+			return enum.ErrBuyWithInsufficientMoney
 		}
 
 		if err := tx.Model(&currentUser).
@@ -64,5 +64,5 @@ func HandleBuy(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": enums.SuccessfulPurchase.String()})
+	ctx.JSON(http.StatusOK, gin.H{"message": enum.SuccessfulPurchase.String()})
 }
