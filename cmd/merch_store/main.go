@@ -1,38 +1,56 @@
 package main
 
 import (
+	"github.com/ners1us/merch_store/internal/model"
+	"log"
+
 	"github.com/gin-gonic/gin"
+	"github.com/ners1us/merch_store/internal/config"
 	"github.com/ners1us/merch_store/internal/handler"
-	"github.com/ners1us/merch_store/internal/middleware"
+	"github.com/ners1us/merch_store/internal/repository"
+	"github.com/ners1us/merch_store/internal/service"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"os"
 )
 
 func main() {
-	dbConnection := os.Getenv("DB_URL")
-	jwtSecret := []byte(os.Getenv("JWT_SECRET"))
+	cfg := config.InitConfig()
 
-	var err error
-	db, err := gorm.Open(postgres.Open(dbConnection), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(cfg.DbUrl), &gorm.Config{})
 	if err != nil {
-		return
+		log.Fatal("failed to connect to database: ", err)
 	}
 
-	handler.Init(db, jwtSecret)
-	middleware.Init(jwtSecret)
+	if err := db.AutoMigrate(&model.User{}, &model.Merch{}, &model.Purchase{}, &model.CoinTransfer{}); err != nil {
+		log.Fatal("failed to migrate database: ", err)
+	}
 
-	router := gin.Default()
-	apiRoutes := router.Group("/api")
+	userRepo := repository.NewUserRepository(db)
+	merchRepo := repository.NewMerchRepository(db)
+	purchaseRepo := repository.NewPurchaseRepository(db)
+	transferRepo := repository.NewCoinTransferRepository(db)
+
+	authService := service.NewAuthService(userRepo, []byte(cfg.JWTSecret))
+	userService := service.NewUserService(userRepo, purchaseRepo, transferRepo)
+	merchService := service.NewMerchService(userRepo, merchRepo, purchaseRepo)
+	transferService := service.NewTransferService(userRepo, transferRepo)
+
+	authHandler := handler.NewAuthHandler(authService)
+	infoHandler := handler.NewInfoHandler(userService)
+	buyHandler := handler.NewBuyHandler(merchService)
+	sendCoinHandler := handler.NewSendCoinHandler(transferService)
+
+	r := gin.Default()
+	api := r.Group("/api")
 	{
-		apiRoutes.POST("/auth", handler.HandleAuth)
-		apiRoutes.GET("/info", middleware.AuthMiddleware(), handler.HandleInfo)
-		apiRoutes.POST("/sendCoin", middleware.AuthMiddleware(), handler.HandleSendCoin)
-		apiRoutes.GET("/buy/:item", middleware.AuthMiddleware(), handler.HandleBuy)
+		api.POST("/auth", authHandler.HandleAuth)
+		api.GET("/info", handler.AuthMiddleware([]byte(cfg.JWTSecret)), infoHandler.HandleInfo)
+		api.POST("/sendCoin", handler.AuthMiddleware([]byte(cfg.JWTSecret)), sendCoinHandler.HandleSendCoin)
+		api.GET("/buy/:item", handler.AuthMiddleware([]byte(cfg.JWTSecret)), buyHandler.HandleBuy)
 	}
 
-	err = router.Run(":8080")
+	err = r.Run(":" + cfg.Port)
 	if err != nil {
-		return
+		log.Fatal("failed running merch store service: ", err)
 	}
 }
