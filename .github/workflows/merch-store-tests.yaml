@@ -28,4 +28,4 @@ jobs:
         run: go mod tidy
 
       - name: Run tests
-        run: go test ./internal/api/... -v --cover
+        run: go test ./internal/handler/... -v --cover
