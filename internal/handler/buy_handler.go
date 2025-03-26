@@ -1,68 +1,44 @@
 package handler
 
 import (
-	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/ners1us/merch_store/internal/enum"
-	"github.com/ners1us/merch_store/internal/model"
-	"gorm.io/gorm"
+	"github.com/ners1us/merch_store/internal/service"
 	"net/http"
-	"time"
+	"strconv"
 )
 
-func HandleBuy(ctx *gin.Context) {
-	userInterface, exists := ctx.Get("user")
+type BuyHandler struct {
+	merchService service.MerchService
+}
+
+func NewBuyHandler(merchService service.MerchService) *BuyHandler {
+	return &BuyHandler{merchService: merchService}
+}
+
+func (bh *BuyHandler) HandleBuy(c *gin.Context) {
+	userIDStr, exists := c.Get("user_id")
 	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": enum.ErrUserNotAuthorized.Error()})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": enum.ErrUserNotAuthorized.Error()})
 		return
 	}
-	user := userInterface.(model.User)
-
-	item := ctx.Param("item")
-	if item == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": enum.ErrNotProvidedItem.Error()})
-		return
-	}
-
-	err := db.Transaction(func(tx *gorm.DB) error {
-		var merch model.Merch
-		if err := tx.Where("name = ?", item).First(&merch).Error; err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				return enum.ErrItemNotFound
-			}
-			return err
-		}
-
-		var currentUser model.User
-		if err := tx.Where("id = ?", user.ID).
-			First(&currentUser).Error; err != nil {
-			return err
-		}
-		if currentUser.Coins < merch.Price {
-			return enum.ErrBuyWithInsufficientMoney
-		}
-
-		if err := tx.Model(&currentUser).
-			UpdateColumn("coins", gorm.Expr("coins - ?", merch.Price)).Error; err != nil {
-			return err
-		}
-
-		purchase := model.Purchase{
-			UserID:    currentUser.ID,
-			MerchItem: item,
-			CreatedAt: time.Now(),
-		}
-		if err := tx.Create(&purchase).Error; err != nil {
-			return err
-		}
-
-		return nil
-	})
-
+	userID, err := strconv.Atoi(userIDStr.(string))
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "invalid user ID"})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": enum.SuccessfulPurchase.String()})
+	item := c.Param("item")
+	if item == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": enum.ErrNotProvidedItem.Error()})
+		return
+	}
+
+	err = bh.merchService.BuyMerch(userID, item)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": enum.SuccessfulPurchase.String()})
 }

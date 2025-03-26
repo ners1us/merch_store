@@ -1,78 +1,41 @@
 package handler
 
 import (
-	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/ners1us/merch_store/internal/enum"
 	"github.com/ners1us/merch_store/internal/model"
-	"gorm.io/gorm"
+	"github.com/ners1us/merch_store/internal/service"
 	"net/http"
-	"time"
+	"strconv"
 )
 
-func HandleSendCoin(ctx *gin.Context) {
-	userInterface, exists := ctx.Get("user")
+type SendCoinHandler struct {
+	transferService service.TransferService
+}
+
+func NewSendCoinHandler(transferService service.TransferService) *SendCoinHandler {
+	return &SendCoinHandler{transferService: transferService}
+}
+
+func (sch *SendCoinHandler) HandleSendCoin(c *gin.Context) {
+	userIDStr, exists := c.Get("user_id")
 	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": enum.ErrUserNotAuthorized.Error()})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": enum.ErrUserNotAuthorized.Error()})
 		return
 	}
-	user := userInterface.(model.User)
+	userID, _ := strconv.Atoi(userIDStr.(string))
 
-	var request model.SendCoinRequest
-	if err := ctx.ShouldBindJSON(&request); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": enum.ErrWrongReqFormat.Error()})
-		return
-	}
-	if request.Amount <= 0 {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": enum.ErrCoinsInappropriateAmount.Error()})
+	var req model.SendCoinRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": enum.ErrWrongReqFormat.Error()})
 		return
 	}
 
-	err := db.Transaction(func(tx *gorm.DB) error {
-		var sender model.User
-		if err := tx.Where("id = ?", user.ID).
-			First(&sender).Error; err != nil {
-			return err
-		}
-		if sender.Coins < request.Amount {
-			return enum.ErrInsufficientMoney
-		}
-
-		var receiver model.User
-		if err := tx.Where("username = ?", request.ToUser).
-			First(&receiver).Error; err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				return enum.ErrReceiverNotFound
-			}
-			return err
-		}
-
-		if err := tx.Model(&sender).
-			UpdateColumn("coins", gorm.Expr("coins - ?", request.Amount)).Error; err != nil {
-			return err
-		}
-
-		if err := tx.Model(&receiver).
-			UpdateColumn("coins", gorm.Expr("coins + ?", request.Amount)).Error; err != nil {
-			return err
-		}
-
-		coinTransfer := model.CoinTransfer{
-			FromUserID: sender.ID,
-			ToUserID:   receiver.ID,
-			Amount:     request.Amount,
-			CreatedAt:  time.Now(),
-		}
-		if err := tx.Create(&coinTransfer).Error; err != nil {
-			return err
-		}
-		return nil
-	})
-
+	err := sch.transferService.SendCoin(userID, req.ToUser, req.Amount)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": enum.SuccessfulTransfer.String()})
+	c.JSON(http.StatusOK, gin.H{"message": enum.SuccessfulTransfer.String()})
 }
