@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"github.com/ners1us/merch_store/internal/enums"
-	"github.com/ners1us/merch_store/internal/models"
+	"github.com/ners1us/merch_store/internal/model"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"net/http"
@@ -13,7 +13,7 @@ import (
 )
 
 func HandleAuth(ctx *gin.Context) {
-	var request models.AuthRequest
+	var request model.AuthRequest
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": enums.ErrWrongReqFormat.Error()})
 		return
@@ -23,7 +23,7 @@ func HandleAuth(ctx *gin.Context) {
 		return
 	}
 
-	var user models.User
+	var user model.User
 	result := db.Where("username = ?", request.Username).First(&user)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		hash, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
@@ -31,7 +31,7 @@ func HandleAuth(ctx *gin.Context) {
 			ctx.JSON(http.StatusInternalServerError, gin.H{"error": enums.ErrCreatingUser.Error()})
 			return
 		}
-		user = models.User{
+		user = model.User{
 			Username: request.Username,
 			Password: string(hash),
 			Coins:    1000,
@@ -51,7 +51,7 @@ func HandleAuth(ctx *gin.Context) {
 	}
 
 	expTime := time.Now().Add(time.Hour)
-	claims := &models.Claims{
+	claims := &model.Claims{
 		Username: user.Username,
 		UserID:   user.ID,
 		StandardClaims: jwt.StandardClaims{
@@ -65,5 +65,5 @@ func HandleAuth(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, models.AuthResponse{Token: tokenStr})
+	ctx.JSON(http.StatusOK, model.AuthResponse{Token: tokenStr})
 }

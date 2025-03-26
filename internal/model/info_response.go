@@ -1,4 +1,4 @@
-package models
+package model
 
 type InfoResponse struct {
 	Coins       int             `json:"coins"`

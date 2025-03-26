@@ -10,7 +10,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/ners1us/merch_store/internal/enums"
-	"github.com/ners1us/merch_store/internal/models"
+	"github.com/ners1us/merch_store/internal/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gorm.io/driver/sqlite"
@@ -21,7 +21,7 @@ func setupTestDB(t *testing.T) *gorm.DB {
 	dbTest, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
 	require.NoError(t, err)
 
-	err = dbTest.AutoMigrate(&models.User{}, &models.Purchase{}, &models.CoinTransfer{}, &models.Merch{})
+	err = dbTest.AutoMigrate(&model.User{}, &model.Purchase{}, &model.CoinTransfer{}, &model.Merch{})
 	require.NoError(t, err)
 
 	db = dbTest
@@ -49,7 +49,7 @@ func TestHandleSendCoinInvalidJSON(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	setupTestDB(t)
 
-	sender := models.User{Username: "sender", Password: "password", Coins: 1000}
+	sender := model.User{Username: "sender", Password: "password", Coins: 1000}
 	require.NoError(t, db.Create(&sender).Error)
 
 	w := httptest.NewRecorder()
@@ -69,10 +69,10 @@ func TestHandleSendCoinInvalidAmount(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	setupTestDB(t)
 
-	sender := models.User{Username: "sender", Password: "password", Coins: 1000}
+	sender := model.User{Username: "sender", Password: "password", Coins: 1000}
 	require.NoError(t, db.Create(&sender).Error)
 
-	requestBody := models.SendCoinRequest{
+	requestBody := model.SendCoinRequest{
 		ToUser: "receiver",
 		Amount: 0,
 	}
@@ -96,12 +96,12 @@ func TestHandleSendCoinInsufficientFunds(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	setupTestDB(t)
 
-	sender := models.User{Username: "sender", Password: "password", Coins: 50}
-	receiver := models.User{Username: "receiver", Password: "password", Coins: 1000}
+	sender := model.User{Username: "sender", Password: "password", Coins: 50}
+	receiver := model.User{Username: "receiver", Password: "password", Coins: 1000}
 	require.NoError(t, db.Create(&sender).Error)
 	require.NoError(t, db.Create(&receiver).Error)
 
-	requestBody := models.SendCoinRequest{
+	requestBody := model.SendCoinRequest{
 		ToUser: "receiver",
 		Amount: 100,
 	}
@@ -141,7 +141,7 @@ func TestHandleInfoDBUserNotFound(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	setupTestDB(t)
 
-	user := models.User{Username: "ghost_user"}
+	user := model.User{Username: "ghost_user"}
 	w := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(w)
 	ctx.Set("user", user)
@@ -159,10 +159,10 @@ func TestHandleInfoSuccess(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	db := setupTestDB(t)
 
-	user := models.User{Username: "user", Password: "password", Coins: 1500}
+	user := model.User{Username: "user", Password: "password", Coins: 1500}
 	require.NoError(t, db.Create(&user).Error)
 
-	purchases := []models.Purchase{
+	purchases := []model.Purchase{
 		{UserID: user.ID, MerchItem: "t-shirt", CreatedAt: time.Now()},
 		{UserID: user.ID, MerchItem: "t-shirt", CreatedAt: time.Now()},
 		{UserID: user.ID, MerchItem: "cup", CreatedAt: time.Now()},
@@ -171,9 +171,9 @@ func TestHandleInfoSuccess(t *testing.T) {
 		require.NoError(t, db.Create(&p).Error)
 	}
 
-	sender := models.User{Username: "sender", Password: "password", Coins: 1002}
+	sender := model.User{Username: "sender", Password: "password", Coins: 1002}
 	require.NoError(t, db.Create(&sender).Error)
-	transferReceived := models.CoinTransfer{
+	transferReceived := model.CoinTransfer{
 		FromUserID: sender.ID,
 		ToUserID:   user.ID,
 		Amount:     300,
@@ -181,9 +181,9 @@ func TestHandleInfoSuccess(t *testing.T) {
 	}
 	require.NoError(t, db.Create(&transferReceived).Error)
 
-	receiver := models.User{Username: "receiver", Password: "password", Coins: 1052}
+	receiver := model.User{Username: "receiver", Password: "password", Coins: 1052}
 	require.NoError(t, db.Create(&receiver).Error)
-	transferSent := models.CoinTransfer{
+	transferSent := model.CoinTransfer{
 		FromUserID: user.ID,
 		ToUserID:   receiver.ID,
 		Amount:     200,
@@ -199,7 +199,7 @@ func TestHandleInfoSuccess(t *testing.T) {
 	HandleInfo(ctx)
 
 	assert.Equal(t, http.StatusOK, w.Code)
-	var response models.InfoResponse
+	var response model.InfoResponse
 	require.NoError(t, json.Unmarshal(w.Body.Bytes(), &response))
 
 	assert.Equal(t, 1500, response.Coins)
@@ -228,7 +228,7 @@ func TestHandleBuyNoItemProvided(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	setupTestDB(t)
 
-	user := models.User{Username: "user", Password: "password", Coins: 1000}
+	user := model.User{Username: "user", Password: "password", Coins: 1000}
 	require.NoError(t, db.Create(&user).Error)
 
 	w := httptest.NewRecorder()
@@ -249,7 +249,7 @@ func TestHandleBuyItemNotFound(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	setupTestDB(t)
 
-	user := models.User{Username: "user", Password: "password", Coins: 1001}
+	user := model.User{Username: "user", Password: "password", Coins: 1001}
 	require.NoError(t, db.Create(&user).Error)
 
 	w := httptest.NewRecorder()
@@ -270,9 +270,9 @@ func TestHandleBuyInsufficientFunds(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	setupTestDB(t)
 
-	user := models.User{Username: "user", Password: "password", Coins: 100}
+	user := model.User{Username: "user", Password: "password", Coins: 100}
 	require.NoError(t, db.Create(&user).Error)
-	merch := models.Merch{Name: "hoodie", Price: 300}
+	merch := model.Merch{Name: "hoodie", Price: 300}
 	require.NoError(t, db.Create(&merch).Error)
 
 	w := httptest.NewRecorder()
@@ -293,9 +293,9 @@ func TestHandleBuySuccess(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	db := setupTestDB(t)
 
-	user := models.User{Username: "user", Password: "password", Coins: 1000}
+	user := model.User{Username: "user", Password: "password", Coins: 1000}
 	require.NoError(t, db.Create(&user).Error)
-	merch := models.Merch{Name: "cap", Price: 250}
+	merch := model.Merch{Name: "cap", Price: 250}
 	require.NoError(t, db.Create(&merch).Error)
 
 	w := httptest.NewRecorder()
@@ -311,11 +311,11 @@ func TestHandleBuySuccess(t *testing.T) {
 	require.NoError(t, json.Unmarshal(w.Body.Bytes(), &response))
 	assert.Equal(t, enums.SuccessfulPurchase.String(), response["message"])
 
-	var updatedUser models.User
+	var updatedUser model.User
 	require.NoError(t, db.First(&updatedUser, user.ID).Error)
 	assert.Equal(t, 750, updatedUser.Coins)
 
-	var purchase models.Purchase
+	var purchase model.Purchase
 	err := db.First(&purchase, "user_id = ? AND merch_item = ?", user.ID, "cap").Error
 	require.NoError(t, err)
 }

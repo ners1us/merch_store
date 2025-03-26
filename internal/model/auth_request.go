@@ -1,4 +1,4 @@
-package models
+package model
 
 type AuthRequest struct {
 	Username string `json:"username"`

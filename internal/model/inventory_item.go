@@ -1,4 +1,4 @@
-package models
+package model
 
 type InventoryItem struct {
 	Type     string `json:"type"`

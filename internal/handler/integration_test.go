@@ -15,7 +15,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/ners1us/merch_store/internal/enums"
-	"github.com/ners1us/merch_store/internal/models"
+	"github.com/ners1us/merch_store/internal/model"
 	"github.com/testcontainers/testcontainers-go/wait"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -58,7 +58,7 @@ func TestMain(m *testing.M) {
 		log.Fatalf("Не удалось подключиться к базе данных: %s", err)
 	}
 
-	err = db.AutoMigrate(&models.User{}, &models.Merch{}, &models.Purchase{}, &models.CoinTransfer{})
+	err = db.AutoMigrate(&model.User{}, &model.Merch{}, &model.Purchase{}, &model.CoinTransfer{})
 	if err != nil {
 		log.Fatalf("Ошибка миграции: %s", err)
 	}
@@ -91,7 +91,7 @@ func clearDB() {
 }
 
 func performAuth(t *testing.T, serverURL, username, password string) string {
-	authRequest := models.AuthRequest{
+	authRequest := model.AuthRequest{
 		Username: username,
 		Password: password,
 	}
@@ -109,7 +109,7 @@ func performAuth(t *testing.T, serverURL, username, password string) string {
 		t.Fatalf("Ожидался статус 200 OK, но получен %d", response.StatusCode)
 	}
 
-	var authResponse models.AuthResponse
+	var authResponse model.AuthResponse
 	err = json.NewDecoder(response.Body).Decode(&authResponse)
 	if err != nil {
 		t.Fatalf("Ошибка декодирования ответа аутентификации: %v", err)
@@ -123,7 +123,7 @@ func TestBuyMerch(t *testing.T) {
 	ts := httptest.NewServer(router)
 	defer ts.Close()
 
-	merchItem := models.Merch{
+	merchItem := model.Merch{
 		Name:  "t-shirt",
 		Price: 500,
 	}
@@ -171,7 +171,7 @@ func TestBuyMerch(t *testing.T) {
 		t.Fatalf("Ожидался статус 200, но получен %d", response.StatusCode)
 	}
 
-	var infoResponse models.InfoResponse
+	var infoResponse model.InfoResponse
 	err = json.NewDecoder(response.Body).Decode(&infoResponse)
 	if err != nil {
 		t.Fatalf("Ошибка декодирования ответа: %v", err)
@@ -192,7 +192,7 @@ func TestSendCoin(t *testing.T) {
 	tokenSender := performAuth(t, ts.URL, "johnnyBravo", "ilikepie")
 	tokenReceiver := performAuth(t, ts.URL, "darthVader", "iamlivingcorpse")
 
-	sendCoinRequest := models.SendCoinRequest{
+	sendCoinRequest := model.SendCoinRequest{
 		ToUser: "darthVader",
 		Amount: 200,
 	}
@@ -235,7 +235,7 @@ func TestSendCoin(t *testing.T) {
 	}
 	defer response.Body.Close()
 
-	var infoSender models.InfoResponse
+	var infoSender model.InfoResponse
 	err = json.NewDecoder(response.Body).Decode(&infoSender)
 	if err != nil {
 		t.Fatalf("Ошибка декодирования для отправителя: %v", err)
@@ -256,7 +256,7 @@ func TestSendCoin(t *testing.T) {
 	}
 	defer response.Body.Close()
 
-	var infoReceiver models.InfoResponse
+	var infoReceiver model.InfoResponse
 	err = json.NewDecoder(response.Body).Decode(&infoReceiver)
 	if err != nil {
 		t.Fatalf("Ошибка декодирования для получателя: %v", err)

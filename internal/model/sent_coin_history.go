@@ -1,4 +1,4 @@
-package models
+package model
 
 type SentCoinHistory struct {
 	ToUser string `json:"toUser"`

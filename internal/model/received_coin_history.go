@@ -1,4 +1,4 @@
-package models
+package model
 
 type ReceivedCoinHistory struct {
 	FromUser string `json:"fromUser"`

@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"github.com/ners1us/merch_store/internal/enums"
-	"github.com/ners1us/merch_store/internal/models"
+	"github.com/ners1us/merch_store/internal/model"
 	"net/http"
 	"strings"
 )
@@ -25,7 +25,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 		tokenStr := parts[1]
 
-		claims := &models.Claims{}
+		claims := &model.Claims{}
 		token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
 			return jwtSecret, nil
 		})
@@ -35,7 +35,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		ctx.Set("user", models.User{
+		ctx.Set("user", model.User{
 			ID:       claims.UserID,
 			Username: claims.Username,
 		})

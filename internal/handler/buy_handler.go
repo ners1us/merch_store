@@ -4,7 +4,7 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/ners1us/merch_store/internal/enums"
-	"github.com/ners1us/merch_store/internal/models"
+	"github.com/ners1us/merch_store/internal/model"
 	"gorm.io/gorm"
 	"net/http"
 	"time"
@@ -16,7 +16,7 @@ func HandleBuy(ctx *gin.Context) {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": enums.ErrUserNotAuthorized.Error()})
 		return
 	}
-	user := userInterface.(models.User)
+	user := userInterface.(model.User)
 
 	item := ctx.Param("item")
 	if item == "" {
@@ -25,7 +25,7 @@ func HandleBuy(ctx *gin.Context) {
 	}
 
 	err := db.Transaction(func(tx *gorm.DB) error {
-		var merch models.Merch
+		var merch model.Merch
 		if err := tx.Where("name = ?", item).First(&merch).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				return enums.ErrItemNotFound
@@ -33,7 +33,7 @@ func HandleBuy(ctx *gin.Context) {
 			return err
 		}
 
-		var currentUser models.User
+		var currentUser model.User
 		if err := tx.Where("id = ?", user.ID).
 			First(&currentUser).Error; err != nil {
 			return err
@@ -47,7 +47,7 @@ func HandleBuy(ctx *gin.Context) {
 			return err
 		}
 
-		purchase := models.Purchase{
+		purchase := model.Purchase{
 			UserID:    currentUser.ID,
 			MerchItem: item,
 			CreatedAt: time.Now(),

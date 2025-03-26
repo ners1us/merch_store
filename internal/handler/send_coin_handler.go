@@ -4,7 +4,7 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/ners1us/merch_store/internal/enums"
-	"github.com/ners1us/merch_store/internal/models"
+	"github.com/ners1us/merch_store/internal/model"
 	"gorm.io/gorm"
 	"net/http"
 	"time"
@@ -16,9 +16,9 @@ func HandleSendCoin(ctx *gin.Context) {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": enums.ErrUserNotAuthorized.Error()})
 		return
 	}
-	user := userInterface.(models.User)
+	user := userInterface.(model.User)
 
-	var request models.SendCoinRequest
+	var request model.SendCoinRequest
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": enums.ErrWrongReqFormat.Error()})
 		return
@@ -29,7 +29,7 @@ func HandleSendCoin(ctx *gin.Context) {
 	}
 
 	err := db.Transaction(func(tx *gorm.DB) error {
-		var sender models.User
+		var sender model.User
 		if err := tx.Where("id = ?", user.ID).
 			First(&sender).Error; err != nil {
 			return err
@@ -38,7 +38,7 @@ func HandleSendCoin(ctx *gin.Context) {
 			return enums.ErrInsufficientMoney
 		}
 
-		var receiver models.User
+		var receiver model.User
 		if err := tx.Where("username = ?", request.ToUser).
 			First(&receiver).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -57,7 +57,7 @@ func HandleSendCoin(ctx *gin.Context) {
 			return err
 		}
 
-		coinTransfer := models.CoinTransfer{
+		coinTransfer := model.CoinTransfer{
 			FromUserID: sender.ID,
 			ToUserID:   receiver.ID,
 			Amount:     request.Amount,
