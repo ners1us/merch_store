@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/ners1us/merch_store/internal/api"
+	"github.com/ners1us/merch_store/internal/handler"
 	"github.com/ners1us/merch_store/internal/middleware"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -19,16 +19,16 @@ func main() {
 		return
 	}
 
-	api.Init(db, jwtSecret)
+	handler.Init(db, jwtSecret)
 	middleware.Init(jwtSecret)
 
 	router := gin.Default()
 	apiRoutes := router.Group("/api")
 	{
-		apiRoutes.POST("/auth", api.HandleAuth)
-		apiRoutes.GET("/info", middleware.AuthMiddleware(), api.HandleInfo)
-		apiRoutes.POST("/sendCoin", middleware.AuthMiddleware(), api.HandleSendCoin)
-		apiRoutes.GET("/buy/:item", middleware.AuthMiddleware(), api.HandleBuy)
+		apiRoutes.POST("/auth", handler.HandleAuth)
+		apiRoutes.GET("/info", middleware.AuthMiddleware(), handler.HandleInfo)
+		apiRoutes.POST("/sendCoin", middleware.AuthMiddleware(), handler.HandleSendCoin)
+		apiRoutes.GET("/buy/:item", middleware.AuthMiddleware(), handler.HandleBuy)
 	}
 
 	err = router.Run(":8080")
