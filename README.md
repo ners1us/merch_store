@@ -4,7 +4,7 @@
 ## Инструменты
 - Go
 - Gin
-- SQL
+- Gorm
 - Docker
 - PostgreSQL
 - Testcontainers
