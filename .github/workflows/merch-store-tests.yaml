@@ -27,5 +27,5 @@ jobs:
       - name: Install dependencies
         run: go mod tidy
 
-      - name: Run tests
+      - name: Run integration tests
         run: go test ./internal/handler/... -v --cover
