@@ -30,6 +30,11 @@ func main() {
 	purchaseRepo := repository.NewPurchaseRepository(db)
 	transferRepo := repository.NewCoinTransferRepository(db)
 
+	err = merchRepo.InitializeMerch()
+	if err != nil {
+		log.Fatal("failed to initialize data in the merch table: ", err)
+	}
+
 	authService := service.NewAuthService(userRepo, []byte(cfg.JWTSecret))
 	userService := service.NewUserService(userRepo, purchaseRepo, transferRepo)
 	merchService := service.NewMerchService(userRepo, merchRepo, purchaseRepo)

@@ -17,3 +17,8 @@ func (mmr *MockMerchRepository) FindByName(name string) (*model.Merch, error) {
 	args := mmr.Called(name)
 	return args.Get(0).(*model.Merch), args.Error(1)
 }
+
+// InitializeMerch Not implemented
+func (mmr *MockMerchRepository) InitializeMerch() error {
+	return nil
+}
