@@ -9,17 +9,17 @@ import (
 	"time"
 )
 
-type merchService struct {
+type merchServiceImpl struct {
 	userRepo     repository.UserRepository
 	merchRepo    repository.MerchRepository
 	purchaseRepo repository.PurchaseRepository
 }
 
 func NewMerchService(userRepo repository.UserRepository, merchRepo repository.MerchRepository, purchaseRepo repository.PurchaseRepository) MerchService {
-	return &merchService{userRepo: userRepo, merchRepo: merchRepo, purchaseRepo: purchaseRepo}
+	return &merchServiceImpl{userRepo: userRepo, merchRepo: merchRepo, purchaseRepo: purchaseRepo}
 }
 
-func (ms *merchService) BuyMerch(userID int, item string) error {
+func (ms *merchServiceImpl) BuyMerch(userID int, item string) error {
 	return ms.userRepo.RunTransaction(func(tx *gorm.DB) error {
 		merch, err := ms.merchRepo.FindByName(item)
 		if err != nil {

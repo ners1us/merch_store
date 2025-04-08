@@ -12,16 +12,16 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-type authService struct {
+type authServiceImpl struct {
 	userRepo  repository.UserRepository
 	jwtSecret []byte
 }
 
 func NewAuthService(userRepo repository.UserRepository, jwtSecret []byte) AuthService {
-	return &authService{userRepo: userRepo, jwtSecret: jwtSecret}
+	return &authServiceImpl{userRepo: userRepo, jwtSecret: jwtSecret}
 }
 
-func (as *authService) Authenticate(username, password string) (string, error) {
+func (as *authServiceImpl) Authenticate(username, password string) (string, error) {
 	user, err := as.userRepo.FindByUsername(username)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

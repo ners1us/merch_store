@@ -9,16 +9,16 @@ import (
 	"time"
 )
 
-type transferService struct {
+type transferServiceImpl struct {
 	userRepo     repository.UserRepository
 	transferRepo repository.CoinTransferRepository
 }
 
 func NewTransferService(userRepo repository.UserRepository, transferRepo repository.CoinTransferRepository) TransferService {
-	return &transferService{userRepo: userRepo, transferRepo: transferRepo}
+	return &transferServiceImpl{userRepo: userRepo, transferRepo: transferRepo}
 }
 
-func (ts *transferService) SendCoin(fromUserID int, toUsername string, amount int) error {
+func (ts *transferServiceImpl) SendCoin(fromUserID int, toUsername string, amount int) error {
 	if amount <= 0 {
 		return enum.ErrCoinsInappropriateAmount
 	}

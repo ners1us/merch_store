@@ -6,17 +6,17 @@ import (
 	"github.com/ners1us/merch_store/internal/repository"
 )
 
-type userService struct {
+type userServiceImpl struct {
 	userRepo     repository.UserRepository
 	purchaseRepo repository.PurchaseRepository
 	transferRepo repository.CoinTransferRepository
 }
 
 func NewUserService(userRepo repository.UserRepository, purchaseRepo repository.PurchaseRepository, transferRepo repository.CoinTransferRepository) UserService {
-	return &userService{userRepo: userRepo, purchaseRepo: purchaseRepo, transferRepo: transferRepo}
+	return &userServiceImpl{userRepo: userRepo, purchaseRepo: purchaseRepo, transferRepo: transferRepo}
 }
 
-func (us *userService) GetUserInfo(userID int) (*model.InfoResponse, error) {
+func (us *userServiceImpl) GetUserInfo(userID int) (*model.InfoResponse, error) {
 	user, err := us.userRepo.FindByID(userID)
 	if err != nil {
 		return nil, enum.ErrReceivingCoinsInfo
