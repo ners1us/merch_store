@@ -1,53 +1,30 @@
 package enum
 
-type ErrorType int
+type ErrorType string
 
 const (
-	ErrInsufficientMoney ErrorType = iota
-	ErrReceiverNotFound
-	ErrUserNotAuthorized
-	ErrWrongReqFormat
-	ErrCoinsInappropriateAmount
-	ErrReceivingCoinsInfo
-	ErrInvalidToken
-	ErrNoUsernameAndPassword
-	ErrReceivingTransferHistory
-	ErrReceivingPurchaseHistory
-	ErrBuyWithInsufficientMoney
-	ErrItemNotFound
-	ErrNotProvidedItem
-	ErrGeneratingToken
-	ErrWrongCredentials
-	ErrInternalServer
-	ErrCreatingUser
-	ErrNoAuthToken
-	ErrWrongTokenFormat
-	ErrEqualReceivers
+	ErrInsufficientMoney        ErrorType = "недостаточно монет"
+	ErrReceiverNotFound         ErrorType = "пользователь к переводу не нашелся"
+	ErrUserNotAuthorized        ErrorType = "пользователь не авторизован"
+	ErrWrongReqFormat           ErrorType = "неверный формат запроса"
+	ErrCoinsInappropriateAmount ErrorType = "количество монет должно быть больше нуля"
+	ErrReceivingCoinsInfo       ErrorType = "ошибка получения информации о монетах"
+	ErrInvalidToken             ErrorType = "неверный или просроченный токен"
+	ErrNoUsernameAndPassword    ErrorType = "имя пользователя и пароль обязательны"
+	ErrReceivingTransferHistory ErrorType = "ошибка получения истории переводов"
+	ErrReceivingPurchaseHistory ErrorType = "ошибка получения информации о покупках"
+	ErrBuyWithInsufficientMoney ErrorType = "недостаточно монет для покупки"
+	ErrItemNotFound             ErrorType = "товар не найден"
+	ErrNotProvidedItem          ErrorType = "не указан товар для покупки"
+	ErrGeneratingToken          ErrorType = "ошибка генерации токена"
+	ErrWrongCredentials         ErrorType = "неверное имя пользователя или пароль"
+	ErrInternalServer           ErrorType = "ошибка сервера"
+	ErrCreatingUser             ErrorType = "ошибка создания пользователя"
+	ErrNoAuthToken              ErrorType = "нет токена авторизации"
+	ErrWrongTokenFormat         ErrorType = "неверный формат токена"
+	ErrEqualReceivers           ErrorType = "получатели должны отличаться друг от друга"
 )
 
-var errorMessages = map[ErrorType]string{
-	ErrInsufficientMoney:        "недостаточно монет",
-	ErrReceiverNotFound:         "пользователь к переводу не нашелся",
-	ErrUserNotAuthorized:        "пользователь не авторизован",
-	ErrWrongReqFormat:           "неверный формат запроса",
-	ErrCoinsInappropriateAmount: "количество монет должно быть больше нуля",
-	ErrReceivingCoinsInfo:       "ошибка получения информации о монетах",
-	ErrInvalidToken:             "неверный или просроченный токен",
-	ErrNoUsernameAndPassword:    "имя пользователя и пароль обязательны",
-	ErrReceivingTransferHistory: "ошибка получения истории переводов",
-	ErrReceivingPurchaseHistory: "ошибка получения информации о покупках",
-	ErrBuyWithInsufficientMoney: "недостаточно монет для покупки",
-	ErrItemNotFound:             "товар не найден",
-	ErrNotProvidedItem:          "не указан товар для покупки",
-	ErrGeneratingToken:          "ошибка генерации токена",
-	ErrWrongCredentials:         "неверное имя пользователя или пароль",
-	ErrInternalServer:           "ошибка сервера",
-	ErrCreatingUser:             "ошибка создания пользователя",
-	ErrNoAuthToken:              "нет токена авторизации",
-	ErrWrongTokenFormat:         "неверный формат токена",
-	ErrEqualReceivers:           "получатели должны отличаться друг от друга",
-}
-
 func (et ErrorType) Error() string {
-	return errorMessages[et]
+	return string(et)
 }
