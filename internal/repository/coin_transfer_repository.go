@@ -5,19 +5,19 @@ import (
 	"gorm.io/gorm"
 )
 
-type coinTransferRepository struct {
+type coinTransferRepositoryImpl struct {
 	db *gorm.DB
 }
 
 func NewCoinTransferRepository(db *gorm.DB) CoinTransferRepository {
-	return &coinTransferRepository{db: db}
+	return &coinTransferRepositoryImpl{db: db}
 }
 
-func (ctr *coinTransferRepository) Create(transfer *model.CoinTransfer) error {
+func (ctr *coinTransferRepositoryImpl) Create(transfer *model.CoinTransfer) error {
 	return ctr.db.Create(transfer).Error
 }
 
-func (ctr *coinTransferRepository) GetReceivedTransfers(userID int) ([]model.ReceivedCoinHistory, error) {
+func (ctr *coinTransferRepositoryImpl) GetReceivedTransfers(userID int) ([]model.ReceivedCoinHistory, error) {
 	var received []model.ReceivedCoinHistory
 	err := ctr.db.Table("coin_transfers").
 		Select("users.username as from_user, coin_transfers.amount").
@@ -27,7 +27,7 @@ func (ctr *coinTransferRepository) GetReceivedTransfers(userID int) ([]model.Rec
 	return received, err
 }
 
-func (ctr *coinTransferRepository) GetSentTransfers(userID int) ([]model.SentCoinHistory, error) {
+func (ctr *coinTransferRepositoryImpl) GetSentTransfers(userID int) ([]model.SentCoinHistory, error) {
 	var sent []model.SentCoinHistory
 	err := ctr.db.Table("coin_transfers").
 		Select("users.username as to_user, coin_transfers.amount").

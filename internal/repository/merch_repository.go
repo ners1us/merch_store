@@ -5,21 +5,21 @@ import (
 	"gorm.io/gorm"
 )
 
-type merchRepository struct {
+type merchRepositoryImpl struct {
 	db *gorm.DB
 }
 
 func NewMerchRepository(db *gorm.DB) MerchRepository {
-	return &merchRepository{db: db}
+	return &merchRepositoryImpl{db: db}
 }
 
-func (mr *merchRepository) FindByName(name string) (*model.Merch, error) {
+func (mr *merchRepositoryImpl) FindByName(name string) (*model.Merch, error) {
 	var merch model.Merch
 	err := mr.db.Where("name = ?", name).First(&merch).Error
 	return &merch, err
 }
 
-func (mr *merchRepository) InitializeMerch() error {
+func (mr *merchRepositoryImpl) InitializeMerch() error {
 	merch := []model.Merch{
 		{"t-shirt", 20},
 		{"cup", 20},

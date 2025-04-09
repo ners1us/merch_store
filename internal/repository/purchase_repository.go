@@ -5,19 +5,19 @@ import (
 	"gorm.io/gorm"
 )
 
-type purchaseRepository struct {
+type purchaseRepositoryImpl struct {
 	db *gorm.DB
 }
 
 func NewPurchaseRepository(db *gorm.DB) PurchaseRepository {
-	return &purchaseRepository{db: db}
+	return &purchaseRepositoryImpl{db: db}
 }
 
-func (pr *purchaseRepository) Create(purchase *model.Purchase) error {
+func (pr *purchaseRepositoryImpl) Create(purchase *model.Purchase) error {
 	return pr.db.Create(purchase).Error
 }
 
-func (pr *purchaseRepository) GetUserPurchases(userID int) ([]model.InventoryItem, error) {
+func (pr *purchaseRepositoryImpl) GetUserPurchases(userID int) ([]model.InventoryItem, error) {
 	var inventory []model.InventoryItem
 	err := pr.db.Model(&model.Purchase{}).
 		Select("merch_item as type, count(*) as quantity").
