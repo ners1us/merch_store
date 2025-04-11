@@ -5,6 +5,11 @@ import (
 	"gorm.io/gorm"
 )
 
+type MerchRepository interface {
+	FindByName(name string) (*model.Merch, error)
+	InitializeMerch() error
+}
+
 type merchRepositoryImpl struct {
 	db *gorm.DB
 }

@@ -5,6 +5,14 @@ import (
 	"gorm.io/gorm"
 )
 
+type UserRepository interface {
+	Create(user *model.User) error
+	FindByUsername(username string) (*model.User, error)
+	FindByID(id int) (*model.User, error)
+	Update(user *model.User) error
+	RunTransaction(fn func(tx *gorm.DB) error) error
+}
+
 type userRepositoryImpl struct {
 	db *gorm.DB
 }

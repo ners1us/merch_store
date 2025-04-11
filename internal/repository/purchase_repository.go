@@ -5,6 +5,11 @@ import (
 	"gorm.io/gorm"
 )
 
+type PurchaseRepository interface {
+	Create(purchase *model.Purchase) error
+	GetUserPurchases(userID int) ([]model.InventoryItem, error)
+}
+
 type purchaseRepositoryImpl struct {
 	db *gorm.DB
 }

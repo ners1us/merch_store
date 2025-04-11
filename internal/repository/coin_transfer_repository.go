@@ -5,6 +5,12 @@ import (
 	"gorm.io/gorm"
 )
 
+type CoinTransferRepository interface {
+	Create(transfer *model.CoinTransfer) error
+	GetReceivedTransfers(userID int) ([]model.ReceivedCoinHistory, error)
+	GetSentTransfers(userID int) ([]model.SentCoinHistory, error)
+}
+
 type coinTransferRepositoryImpl struct {
 	db *gorm.DB
 }
