@@ -6,6 +6,10 @@ import (
 	"github.com/ners1us/merch_store/internal/repository"
 )
 
+type UserService interface {
+	GetUserInfo(userID int) (*model.InfoResponse, error)
+}
+
 type userServiceImpl struct {
 	userRepo     repository.UserRepository
 	purchaseRepo repository.PurchaseRepository

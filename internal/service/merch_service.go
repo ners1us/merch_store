@@ -9,6 +9,10 @@ import (
 	"time"
 )
 
+type MerchService interface {
+	BuyMerch(userID int, item string) error
+}
+
 type merchServiceImpl struct {
 	userRepo     repository.UserRepository
 	merchRepo    repository.MerchRepository

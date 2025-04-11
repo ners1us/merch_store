@@ -12,6 +12,10 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
+type AuthService interface {
+	Authenticate(username, password string) (string, error)
+}
+
 type authServiceImpl struct {
 	userRepo  repository.UserRepository
 	jwtSecret []byte

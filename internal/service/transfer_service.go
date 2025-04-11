@@ -9,6 +9,10 @@ import (
 	"time"
 )
 
+type TransferService interface {
+	SendCoin(fromUserID int, toUsername string, amount int) error
+}
+
 type transferServiceImpl struct {
 	userRepo     repository.UserRepository
 	transferRepo repository.CoinTransferRepository
