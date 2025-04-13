@@ -8,7 +8,7 @@ services:
       postgres-db:
         condition: service_healthy
     environment:
-      - DB_URL=postgres://admin:password@postgres-db:5432/merch_store_db
+      - DB_URL=postgres://admin:password@postgres-db:5432/merch_store-db
       - JWT_SECRET=too_elaborate_jwt_secret
       - PORT=8080
     ports:
@@ -24,7 +24,7 @@ services:
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: merch_store_db
+      POSTGRES_DB: merch_store-db
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
