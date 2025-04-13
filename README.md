@@ -89,5 +89,6 @@ docker volume rm merch_store_postgres_data
 ## Данные для авторизации в БД
 
 - PostgreSQL, порт - 5432:
+    - name: merch_store-db
     - username: admin
     - password: password
