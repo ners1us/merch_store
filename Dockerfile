@@ -4,7 +4,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
 WORKDIR /app/cmd/merch_store
-RUN CGO_ENABLED=0 go build -o main .
+RUN CGO_ENABLED=0 GOOS=linux go build -o main .
 
 FROM alpine:latest
 EXPOSE 8080
